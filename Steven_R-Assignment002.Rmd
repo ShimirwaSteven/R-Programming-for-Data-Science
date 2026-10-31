@@ -1,0 +1,321 @@
+---
+title: "R-AssigmentGGplot"
+author: "Steven Shimirwa 20252MBI050"
+date: "2026-10-30"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+## GGPLOT
+I will be using NewYork Flights data set
+
+```{r}
+library(nycflights13)
+library(dplyr)
+```
+
+```{r}
+install.packages(c("tidyverse"))
+```
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+```
+
+
+
+## I will be doing analysis for january month only in the flights data
+
+
+#loading the packages and  isolating January
+
+
+```{r}
+```{r}
+library(tidyverse)
+library(nycflights13)
+
+jan <- filter(flights, month == 1)
+```
+
+```
+
+```{r}
+```{r}
+summary(jan)
+```
+
+```
+#Jan in numbers
+
+```{r}
+```{r}
+nrow(jan)                              # how many flights
+sum(is.na(jan$dep_delay))              # flights with no delay value (mostly cancelled)
+mean(jan$dep_delay, na.rm = TRUE)      # average delay in minutes
+max(jan$dep_delay, na.rm = TRUE)       # worst delay
+```
+
+```
+
+##Breaking the data down
+
+
+#A new column: a flight is "Delayed" if it left more than 15 minutes late
+
+```{r}
+```{r}
+jan <- mutate(jan, status = ifelse(dep_delay > 15, "Delayed", "On time"))
+```
+
+```
+#A cleaner copy for plots: no missing values, no extreme delays
+
+```{r}
+```{r}
+jan_plot <- filter(jan, !is.na(dep_delay), dep_delay < 120)
+```
+
+```
+
+# A small random sample, used for the jitter plot
+
+```{r}
+```{r}
+set.seed(123)
+jan_small <- slice_sample(jan_plot, n = 1000)
+```
+
+```
+
+### 1. geom_bar() for number of flights
+
+```{r}
+```{r}
+ggplot(jan, aes(x = origin)) +
+  geom_bar(fill = "gray") +
+  labs(title = "January flights by origin airport", x = "Origin", y = "Number of flights")
+```
+
+```
+
+## delayed and on-time
+
+```{r}
+```{r}
+ggplot(filter(jan, !is.na(status)), aes(x = origin, fill = status)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Delayed and on-time flights by origin", x = "Origin", y = "Number of flights")
+```
+
+```
+
+
+### 2. geom_density() and geom_rug() for the smooth shape
+
+```{r}
+```{r}
+ggplot(jan_plot, aes(x = dep_delay, fill = origin)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Delay shape by origin", x = "Delay (minutes)", y = "Density")
+```
+#The three curves have a similar shape, with a high peak near zero. A curve that is higher or wider on the right side means more long delays.
+```
+```{r}
+```{r}
+ggplot(jan_plot, aes(x = dep_delay)) +
+  geom_density(fill = "grey80") +
+  geom_rug(alpha = 0.1) +
+  labs(title = "Density with a rug", x = "Delay (minutes)", y = "Density")
+```
+#Each small tick at the bottom is one flight. The ticks are thickest near zero, so most flights had little or no delay. The ticks get thinner towards the right, where the long delays are.
+```
+
+
+### 3. geom_boxplot(), geom_violin() and geom_jitter() to compare airports
+
+```{r}
+```{r}
+ggplot(jan_plot, aes(x = origin, y = dep_delay, fill = origin)) +
+  geom_boxplot() +
+  labs(title = "Delays by origin (boxplot)", x = "Origin", y = "Delay (minutes)")
+```
+The line inside each box is the median, the typical delay. LGA has the lowest median. The dots above the boxes are unusual, very long delays. A taller box means the delays are more varied.
+```
+
+```{r}
+```{r}
+ggplot(jan_plot, aes(x = origin, y = dep_delay, fill = origin)) +
+  geom_violin(alpha = 0.6) +
+  labs(title = "Delays by origin (violin)", x = "Origin", y = "Delay (minutes)")
+```
+The violin shows the same data as the boxplot, plus the shape. A wide part means many flights had that delay. All three violins are wide near zero and narrow upwards, so long delays are rare for every airport.
+```
+
+```{r}
+```{r}
+ggplot(jan_small, aes(x = origin, y = dep_delay, colour = origin)) +
+  geom_jitter(width = 0.25, alpha = 0.5) +
+  labs(title = "Delays by origin (jitter, 1000 flights)", x = "Origin", y = "Delay (minutes)")
+```
+#Each dot is one flight. The dots crowd the bottom of the graph, which confirms that most delays are short. The few dots high up are the flights with long delays. The three airports look [similar / different] in how crowded they are.
+#In the boxplot the middle line is the median. The violin shows the shape, and the jitter shows individual flights.
+
+
+```
+### 4. geom_line(), geom_hline() and geom_text() for day by day
+
+# counting flights and averaging the delay for each day first
+
+```{r}
+```{r}
+daily <- jan %>%
+  group_by(day) %>%
+  summarise(flights = n(), avg_delay = mean(dep_delay, na.rm = TRUE))
+```
+
+```
+# Flights per day, with a line at the daily average
+
+```{r}
+```{r}
+ggplot(daily, aes(x = day, y = flights)) +
+  geom_line(colour = "steelblue", linewidth = 1) +
+  geom_hline(yintercept = mean(daily$flights), colour = "red", linetype = "dashed") +
+  labs(title = "Flights per day in January", x = "Day", y = "Number of flights")
+```
+#Average departure delay per day in January. The number marks the worst day.
+```
+
+# Average delay per day, with the worst day labelled
+
+```{r}
+```{r}
+ggplot(daily, aes(x = day, y = avg_delay)) +
+  geom_line(colour = "darkorange", linewidth = 1) +
+  geom_text(data = filter(daily, avg_delay == max(avg_delay)),
+            aes(label = day), vjust = -1) +
+  labs(title = "Average delay per day in January", x = "Day", y = "Average delay (minutes)")
+```
+#geom_text() prints the day number above the highest point
+The average delay is not the same every day. It was highest on day 30, at about 29 minutes. Some days are close to zero, so January delays come in bad days, not evenly. The cause of the worst day is not in this data, so it should be written only as a possible reason, such as weather.
+```
+
+###5. geom_point() for how two things relate
+
+A scatter plot puts one flight on the graph as one dot. Here, each dot shows how late a flight left (x) and how late it arrived (y).
+
+```{r}
+```{r}
+set.seed(123)
+jan_scatter <- jan_plot %>%
+  filter(!is.na(arr_delay)) %>%
+  slice_sample(n = 1000)
+```
+
+```
+```{r}
+```{r point-delay, fig.cap="Figure 11: Departure delay against arrival delay for 1,000 January flights."}
+ggplot(jan_scatter, aes(x = dep_delay, y = arr_delay)) +
+  geom_point(alpha = 0.4, colour = "steelblue") +
+  labs(title = "Departure delay against arrival delay",
+       x = "Departure delay (minutes)", y = "Arrival delay (minutes)")
+```
+``#: Each dot is one flight. The dots slope upwards from the bottom left to the top right, which means flights that leave late usually arrive late. Flights near zero on the x-axis are mostly near zero on the y-axis. Some dots are well below the main cloud, which are flights that left late but made up time in the air.
+`
+
+
+```{r}
+
+```
+
+
+###6. geom_smooth() for the trend line
+
+## geom_smooth() adds a line that summarises the pattern in the dots. Use the same graph and add one line:
+
+```{r smooth-delay, fig.cap="Figure 12: Departure delay against arrival delay with a trend line (red)."}
+ggplot(jan_scatter, aes(x = dep_delay, y = arr_delay)) +
+  geom_point(alpha = 0.4, colour = "steelblue") +
+  geom_smooth(method = "lm", colour = "red") +
+  labs(title = "Trend between departure and arrival delay",
+       x = "Departure delay (minutes)", y = "Arrival delay (minutes)")
+```
+#Analysis: The red line goes upwards, so a longer departure delay goes with a longer arrival delay. The line is close to the dots, so the relationship is [strong / moderate]. Roughly, for every extra minute of departure delay, arrival is delayed by about ___ minutes. This shows a link between the two, but it doesn’t prove that one causes the other.
+
+
+
+###7. cbind() and rbind() to build a summary table
+
+#Table 1: flights and average delay for each airport
+
+```{r}
+```{r}
+by_origin <- jan %>%
+  group_by(origin) %>%
+  summarise(flights = n(), avg_delay = round(mean(dep_delay, na.rm = TRUE), 1))
+view(by_origin)
+
+```
+
+```
+# Table 2: percent of flights delayed
+
+```{r}
+```{r}
+pct <- jan %>%
+  group_by(origin) %>%
+  summarise(pct_delayed = round(mean(dep_delay > 15, na.rm = TRUE) * 100, 1))
+view(pct)
+```
+
+```
+# cbind joins columns side by side
+
+```{r}
+```{r}
+summary_table <- cbind(as.data.frame(by_origin), pct_delayed = pct$pct_delayed)
+view(summary_table)
+```
+
+```
+# A total row for all of January
+
+```{r}
+```{r}
+total_row <- data.frame(origin = "ALL", flights = nrow(jan),
+                        avg_delay = round(mean(jan$dep_delay, na.rm = TRUE), 1),
+                        pct_delayed = round(mean(jan$dep_delay > 15, na.rm = TRUE) * 100, 1))
+view(total_row)
+```
+
+```
+# rbind stacks rows on top of each other
+
+```{r}
+```{r}
+rbind(summary_table, total_row)
+```
+
+```
+
+
+
