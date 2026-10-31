@@ -1,0 +1,109 @@
+---
+title: "Steven_R-Assignment.Rmd"
+author: "Steven Shimirwa 20252MBI050"
+date: "2026-10-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+```
+```
+```{r}
+install.packages(c("haven", "DBI", "RSQLite", "jsonlite"))
+```
+
+## R Markdown
+Import data from statistical packages and from Database Management Systems.
+
+### 1. Importing data from statistical packages
+##import Stata file
+
+
+
+```{r}
+```{r import-stata}
+library(haven)
+file_path <- "C:\\Users\\steve\\Downloads\\"
+```
+```
+
+
+```{r}
+```{r import-dta-data}
+dummydata <- read_dta(paste0(file_path, "dummy_dm_htn_100_patients.dta"))
+head(dummydata)
+summary(dummydata)
+```
+```
+
+
+### Importing a CSV file
+
+```{r}
+```{r import-csv-data}
+csv_path <- "C:\\Users\\steve\\Downloads\\tfct_food_composition.csv"
+data <- read.csv(csv_path)
+```
+```
+```{r}
+```{r}
+head(data)
+```
+```
+```{r}
+```{r}
+summary(data)
+```
+```
+
+
+### Import from a DBMS
+
+```{r}
+```{r import-sqlite-data}
+library(DBI)
+library(RSQLite)
+
+db_path <- "C:\\Users\\steve\\Downloads\\food_composition.sqlite"
+con <- dbConnect(RSQLite::SQLite(), dbname = db_path)
+
+dbWriteTable(con, "food_composition", data, overwrite = TRUE)
+
+dbListTables(con)
+dbListFields(con, "food_composition")
+
+foods <- dbGetQuery(con, "SELECT * FROM food_composition LIMIT 20;")
+
+dbDisconnect(con)
+```
+```
+```{r}
+```{r}
+head(foods)
+```
+```
+
+
+## Import from the public API
+
+
+```{r}
+```{r}
+library(jsonlite)
+users <- fromJSON("https://jsonplaceholder.typicode.com/users")
+```
+```
+```{r}
+```{r}
+head(users)
+```
+
+```
+
+
