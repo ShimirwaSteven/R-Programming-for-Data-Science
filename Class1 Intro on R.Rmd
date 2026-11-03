@@ -1,0 +1,552 @@
+---
+title: "Class Day 1, Inro on R"
+author: "Steven Shimirwa 20252MBI050"
+date: "2026-10-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+#Data Structure
+
+Vector
+
+```{r}
+x <- c(0.5,0.6)
+age <-c(20,35,32,29)
+summary(age)
+```
+example2
+```{r}
+age<-c(40,67,17,78,54,34,27)
+mean(age)
+```
+
+#Logical
+
+```{r}
+x<- c(TRUE, FALSE)
+x<- c(T,F)
+x
+```
+
+
+##Character
+
+```{r}
+x <- c("a", "b", "c")
+class<-c("M","F","F","M")
+class
+x
+```
+
+Integer
+```{r}
+n <- 9:29
+n
+```
+Complex
+
+```{r}
+z <- matrix(1:6, nrow = 4, ncol = 6)
+z
+```
+
+```{r}
+y <- matrix(1:6, nrow = 2, ncol = 3)
+y
+```
+
+```{r}
+z%*%y
+
+```
+
+
+List
+```{r}
+(x<-list(1, "a", 1,4i))
+```
+
+Factor
+
+```{r}
+(x<-factor(c("yes", "yes", "no","no", "yes", "yes")))
+
+```
+Vector with NAs
+
+```{r}
+(x <- c(1, 2, NA, 10, 3))
+```
+```{r}
+is.na(x)
+```
+
+```{r}
+x<-c(1,2,4, "NA",5,7)
+bad <- is.na(x)
+print(bad)
+```
+```{r}
+x[!bad]
+```
+subset with no kssing values in multiple R objects
+
+```{r}
+x <- c(1, 2, NA, 4, NA, 5)
+y <- c("a", "b", NA, "d", NA, "f")
+good <- complete.cases(x, y)
+good
+```
+
+
+##coersion
+
+```{r}
+(sum(c(TRUE, TRUE, FALSE,FALSE,FALSE)))
+```
+
+CREATING DATA
+
+CREATE DATA FRAME
+
+```{r}
+patientID <- c(1,2,3,4,5,6,7,8,9,10)
+
+SBP <- c(132,122,141,112,105,165,144,128,133,109)
+
+DBP <- c(68,81,69,70,71,96,89,81,79,68)
+
+pulse <- c(58,65,87,60,99,77,76,81,49,89)
+
+WghtKG <- c(77,56,48,99,101,81,66,58,89,78)
+
+VitalSigns <- data.frame(patientID, SBP, DBP, pulse, WghtKG)
+
+print(VitalSigns)
+
+```
+importing data
+
+## from Stastical package and DBMSs
+
+
+```{r}
+course<- read.csv("C:\\Users\\steve\\Downloads\\Course.csv")
+variable.names(course)
+```
+```{r}
+View(course)
+head(course)
+```
+
+```{r}
+tail(course)
+```
+```{r}
+summary(course)
+```
+
+```{r}
+summary(course$ProgrammeID)
+```
+```{r}
+course$CourseName
+```
+
+
+
+
+######R built-in dataset
+
+
+
+```{r}
+data()
+data("airquality")
+variable.names(airquality)
+```
+```{r}
+str(women)
+
+```
+```{r}
+View(women)
+```
+
+```{r}
+str(airquality)
+```
+
+
+#EXPLORATION DATA ANALYSIS
+
+EXAMIN NUMERICAL VARIABLE USING COMMON SUMMARY
+
+```{r}
+women
+```
+
+```{r}
+summary(women)
+```
+
+```{r}
+apply(women, 1, mean)
+```
+
+```{r}
+apply(women, 2, sd)
+
+```
+```{r}
+c(mean(women$height), sd(women$height))
+```
+```{r}
+c(mean(women$weight), sd(women$weight))
+```
+
+```{r}
+c(Mean=mean(women$height), SD=sd(women$height))
+```
+
+##variation and covariation using both numerical and graphs
+
+#relationship a categorical and continuous variable
+
+```{r}
+data("iris")
+head(iris)
+```
+
+```{r}
+mean(iris$Petal.Length)
+```
+```{r}
+mean(iris$Petal.Length[iris$Species=="setose"])
+```
+
+```{r}
+mean(iris$Petal.Length[iris$Species=="virginica"])
+```
+
+```{r}
+by(iris$Petal.Length, iris$Species, mean)
+```
+
+```{r}
+by(iris$Petal.Length, iris$Species, sd)
+
+```
+```{r}
+Mean=(by(iris$Petal.Length, iris$Species, mean))
+
+```
+
+```{r}
+by(iris$Petal.Length, iris$Species, summary)
+
+```
+
+Visualise the differences in continuous variables between categories Box-and-whisker plot
+
+```{r}
+boxplot(iris$Sepal.Length~iris$Species,data=iris, main="Comparison of categorical vs quantitative")
+```
+
+
+Relationship between two categorical variable
+
+```{r}
+ucba<-data.frame(UCBAdmissions)
+head(ucba)
+```
+
+
+```{r}
+cross<-xtabs(Freq~Gender+Admit,data=ucba)
+(cross<-xtabs(Freq~Gender+Admit, data=ucba))
+```
+
+```{r}
+prop.table(cross,1)
+```
+
+SIMPSON'S PARADOX
+Phenomenon, where a trend that appears in combined groups of data disappears or reverses when broken down into groups
+
+
+```{r}
+cross2<-xtabs(Freq~Gender+Admit,data=ucba[ucba$Dept=="F",])
+prop.table(cross2,1)
+```
+
+BAR CHART
+
+```{r}
+dat <- read.table(text = "ProdA ProdB ProdC ProdD
+1 110 50 60 70
+2 120 50 80 65", header= TRUE)
+
+ barplot(as.matrix(dat), beside=TRUE,col=c("Red", "green"))
+```
+
+
+```{r}
+#barplot(as.matrix(dat), bedside=TRUE, col=c("gold3","red"))
+
+dat <- read.table(text = "
+A  B  C  D  E  F  G
+1  10 80 30 90 70 60 90
+2  20 50 70 50 40 10 40
+3  60 80 80 60 60 30 160
+4  20 40 70 80 20 10 70
+", header = TRUE)
+
+
+barplot(as.matrix(dat))
+```
+
+scatter plot
+
+```{r}
+plot(weight~height, data=women)
+```
+
+```{r}
+plot(women$height,women$weight)
+```
+
+```{r}
+plot(women[,1], women[,2],main= "Graph")
+```
+
+```{r}
+cor(women$height, women$weight)
+```
+
+Linear Models
+
+```{r}
+plot(weight~height, data = women)
+abline(lm(weight~height, data = women)$coefficient)
+```
+
+```{r}
+data_lm <- lm(height~weight, data = women)
+summary(data_lm)
+```
+```{r}
+plot(data_lm)
+```
+```{r}
+hist(women$height)
+```
+```{r}
+hist(women$weight,col= "blue")
+```
+
+Linear with other line
+
+```{r}
+plot(weight~height, data = women)
+abline(lm(weight~height,data = women)$coefficient)
+lines(lowess(women$height, women$weight), col="blue")
+```
+```{r}
+cor(women$height, women$weight)
+```
+
+```{r}
+?cor
+```
+
+```{r}
+lm(weight~height, data = women)
+```
+
+Data Management
+
+Create another variable
+
+```{r}
+attach(women)
+(BMI <- weight/(height/100)^2)
+```
+```{r}
+BMI<-round(weight/(height/100)^2, digits = 2)
+BMI
+```
+
+```{r}
+head(cbind(women,BMI), n=8)
+```
+
+```{r}
+new_women <- cbind(women,BMI)
+tail(cbind(women,BMI), n=10)
+```
+
+```{r}
+View(new_women)
+```
+
+```{r}
+summary(BMI)
+```
+
+```{r}
+stem(BMI,scale = 2)
+```
+
+Date
+
+```{r}
+today<-Sys.Date()
+format(today, format="%B %d %Y")
+```
+
+```{r}
+format(today, format="%A")
+```
+
+```{r}
+today <- Sys.Date()
+dob <- as.Date("1999-08-18")
+difftime(today, dob, units = "days")
+```
+```{r}
+today <- Sys.Date()
+dob <- as.Date("1999-08-18")
+difftime(today, dob, units = "mins")
+```
+```{r}
+startdate<- as.Date("2000-05-24")
+enddate <- as.Date("2016-05-24")
+days<- enddate-startdate
+days
+
+```
+
+Subsetting
+
+```{r}
+manager <- c(1,2,3,4,5)
+country<- c("US","US","UK","UK","UK")
+gender<-c("M","F","F","M","F")
+age<-c(32,45,25,39,99)
+q1<-c(5,3,3,3,2)
+q2<-c(4,5,5,3,2)
+q3<-c(5,2,5,4,1)
+q4<-c(5,5,5,NA,2)
+q5<-c(5,5,2,NA,1)
+leadership<-data.frame(manager,country, gender, age, q1,q2,q3,q4,q5, stringsAsFactors = TRUE)
+leadership<-data.frame(manager,country, gender, age, q1,q2,q3,q4,q5)
+str(leadership)
+```
+```{r}
+names(leadership)
+```
+missing values
+
+```{r}
+leadership$age[leadership$age==99]<-NA
+View(leadership)
+```
+
+
+```{r}
+leadership$agecat[leadership$age >75]<-"Elder"
+leadership$agecat[leadership$age>=35 & leadership$age<=75]<-"Middle Aged"
+leadership$agecat[leadership$age <35]<- "Young"
+```
+
+One way to handle missing value
+Deleting all observations with missing data ( Listwise deletion) is one of the several methods of handling incomplete datasets. Note: You can also replacing the missing value by the average of the remaining data.
+
+
+```{r}
+is.na(leadership[,5:9])
+```
+
+```{r}
+newdata<-na.omit(leadership)
+newdata
+```
+
+sorting
+
+```{r}
+order(leadership$age)
+```
+```{r}
+newdata2<-leadership[order(leadership$age),]
+newdata2
+```
+
+Subset (selecting variables,dropping variables,selecting observation )
+
+```{r}
+newdata3<-leadership[,c(5:9)]
+myvars<-c("q1","q2","q3","q4","q5")
+(newdata3<-leadership[myvars])
+```
+```{r}
+newdata4<-leadership[,c(-1,-2)]
+(newdata4<-leadership[,-(1:5)])
+```
+
+```{r}
+newdata5<-leadership[,c(-1,-7)]
+leadership[[4]]
+```
+
+```{r}
+leadership$age
+```
+
+```{r}
+newdata6<-leadership[c(-1,-3),]
+newdata6<-leadership[c(2,4,5),]
+newdata7<-subset(leadership,age>=35|age<24,select=c(q1,q2,q3,q4,q5))
+```
+
+
+```{r}
+attach(leadership)
+
+```
+
+```{r}
+(newdata7<-leadership[gender=="M" & age>30,])
+
+```
+
+```{r}
+detach(leadership)
+```
+
